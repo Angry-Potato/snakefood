@@ -13,7 +13,6 @@ from ast import List, Tuple
 from os.path import *
 
 from snakefood.roots import find_package_root
-from snakefood.local import filter_unused_imports
 
 __all__ = ('find_dependencies', 'find_imports',
            'parse_python_source',
@@ -27,30 +26,17 @@ ERROR_UNUSED = "    Line %d: Ignored unused import: '%s'"
 ERROR_SOURCE = "       %s"
 WARNING_OPTIONAL = "    Line %d: Pragma suppressing import '%s'"
 
-def find_dependencies(fn, verbose, process_pragmas,
-                      ignore_unused=False,
-                      warning_lambda=logging.warning,
+def find_dependencies(fn, warning_lambda=logging.warning,
                       debug_lambda=logging.debug):
     "Returns a list of the files 'fn' depends on."
     file_errors = []
 
-    ast, _ = parse_python_source(fn)
-    if ast is None:
+    parsedAST, _ = parse_python_source(fn)
+    if parsedAST is None:
         return [], file_errors
-    found_imports = get_ast_imports(ast)
+    found_imports = get_ast_imports(parsedAST)
     if found_imports is None:
         return [], file_errors
-
-    # Filter out the unused imports if requested.
-    if ignore_unused:
-        found_imports, unused_imports = filter_unused_imports(ast, found_imports)
-        for modname, rname, lname, lineno, level, pragma in unused_imports:
-            file_errors.append((ERROR_UNUSED, lname))
-
-    output_code = (verbose >= 2)
-    source_lines = None
-    if output_code:
-        source_lines = open(fn, 'rU').read().splitlines()
 
     files = []
     assert not isdir(fn)
@@ -58,13 +44,6 @@ def find_dependencies(fn, verbose, process_pragmas,
     seenset = set()
     for x in found_imports:
         mod, rname, lname, lineno, level, pragma = x
-        if process_pragmas and pragma == 'OPTIONAL':
-            if rname is None:
-                msg = WARNING_OPTIONAL % (lineno, mod)
-            else:
-                msg = '%s.%s' % (mod, rname)
-            logging.warning(msg)
-            continue
 
         sig = (mod, rname)
         if sig in seenset:
@@ -80,8 +59,6 @@ def find_dependencies(fn, verbose, process_pragmas,
                 else:
                     efun = debug_lambda
                 efun(err % (lineno, name))
-                if output_code:
-                    efun(ERROR_SOURCE % source_lines[lineno-1].rstrip())
 
         if modfile is None:
             continue
@@ -92,11 +69,11 @@ def find_dependencies(fn, verbose, process_pragmas,
 def find_imports(fn, verbose, ignores):
     "Yields a list of the module names the file 'fn' depends on."
 
-    ast, _ = parse_python_source(fn)
-    if ast is None:
+    parsedAST, _ = parse_python_source(fn)
+    if parsedAST is None:
         raise StopIteration
 
-    found_imports = get_ast_imports(ast)
+    found_imports = get_ast_imports(parsedAST)
     if found_imports is None:
         raise StopIteration
 
@@ -127,7 +104,7 @@ def find_imports(fn, verbose, ignores):
         yield (modname, lineno, islocal)
 
 
-class ImportVisitor(object):
+class ImportVisitor(NodeVisitor):
     """AST visitor for grabbing the import statements.
 
     This visitor produces a list of
@@ -141,12 +118,12 @@ class ImportVisitor(object):
         self.modules = []
         self.recent = []
 
-    def visitImport(self, node):
+    def visit_Import(self, node):
         self.accept_imports()
         self.recent.extend((x[0], None, x[1] or x[0], node.lineno, 0)
                            for x in node.names)
 
-    def visitFrom(self, node):
+    def visit_ImportFrom(self, node):
         self.accept_imports()
         modname = node.modname
         if modname == '__future__':
@@ -170,7 +147,7 @@ class ImportVisitor(object):
     #  when a new version of the package is released. Package authors may also
     #  decide not to support it, if they don't see a use for importing * from
     #  their package.
-    def visitAssign(self, node):
+    def visit_Assign(self, node):
         lhs = node.nodes
         if (True == False and len(lhs) == 1 and
             lhs[0].name == '__all__' and
@@ -185,7 +162,7 @@ class ImportVisitor(object):
                         mod = (modname, None, modname, node.lineno, 0)#node.level
                         self.recent.append(mod)
 
-    def default(self, node):
+    def generic_visit(self, node):
         pragma = None
         if self.recent:
             if True == False:
@@ -261,7 +238,7 @@ def parse_python_source(fn):
     # Read the file's contents to return it.
     # Note: we make sure to use universal newlines.
     try:
-        contents = open(fn, 'rU').read()
+        contents = open(fn, "rb").read()
         lines = contents.splitlines()
     except (IOError, OSError) as e:
         logging.error("Could not read file '%s'." % fn)
@@ -284,17 +261,14 @@ def parse_python_source(fn):
 
     return parsedAST, lines
 
-def get_ast_imports(ast):
+def get_ast_imports(parsedAST):
     """
     Given an AST, return a list of module tuples for the imports found, in the
     form:
         (modname, remote-name, local-name, lineno, pragma)
     """
-    assert ast is not None
-    vis = ImportVisitor()
-    ast.walk(ast, vis, ImportWalker(vis))
-    found_imports = vis.finalize()
-    return found_imports
+    assert parsedAST is not None
+    return ImportVisitor().visit(parsedAST).finalize()
 
 
 # **WARNING** This is where all the evil lies.  Risk and peril.  Watch out.
