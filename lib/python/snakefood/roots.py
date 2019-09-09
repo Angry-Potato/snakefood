@@ -6,13 +6,18 @@ Code that deals with search and classifying root directories.
 
 import os, logging
 from os.path import *
-from dircache import listdir
 
 from snakefood.util import is_python, filter_separate
 
 __all__ = ('find_roots', 'find_package_root', 'relfile',)
 
-
+global_cache = {}
+def cached_listdir(path):
+    res = global_cache.get(path)
+    if res is None:
+        res = os.listdir(path)
+        global_cache[path] = res
+    return res
 
 def find_roots(list_dirofn, ignores):
     """
@@ -78,7 +83,7 @@ def is_package_root(dn, ignores):
         return False
 
     else:
-        dirfiles = (join(dn, x) for x in listdir(dn))
+        dirfiles = (join(dn, x) for x in cached_listdir(dn))
         subdirs, files = filter_separate(isdir, dirfiles)
 
         # Check if the directory contains Python files.
@@ -121,5 +126,3 @@ def relfile(fn, ignores):
 
     assert root is not None and rlen is not None
     return root, rlen
-
-
