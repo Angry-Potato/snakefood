@@ -8,7 +8,7 @@ for relative filenames.
 # See http://furius.ca/snakefood/ for licensing details.
 
 import sys
-from itertools import imap
+
 
 from snakefood.fallback.collections import defaultdict
 from snakefood.depends import read_depends, output_depends
@@ -30,7 +30,7 @@ def read_clusters(fn):
     "Return a list of cluster prefixes read from the file 'fn'."
     f = open(fn, 'rU')
     clusters = []
-    for x in imap(str.strip, f.xreadlines()):
+    for x in map(str.strip, f):
         if not x:
             continue
         clusters.append(x)

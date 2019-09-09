@@ -2,7 +2,7 @@
 Test roots computation.
 """
 
-from __future__ import print_function
+
 
 from os.path import *
 from testsupport import *

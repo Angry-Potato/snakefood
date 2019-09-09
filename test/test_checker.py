@@ -52,7 +52,7 @@ def test_checker_expected():
                  os.listdir(checkdir) if fn.endswith('.py')]
 
     for fn in pytocheck:
-        print 'Testing checker on: %s' % fn
+        print('Testing checker on: %s' % fn)
         compare_expect(None, fn.replace('.py', '.expect'),
                        'sfood-checker', fn, filterdir=(data, 'ROOT'))
 

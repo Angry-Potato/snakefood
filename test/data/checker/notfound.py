@@ -2,7 +2,7 @@
 """
 """
 
-from __future__ import with_statement
+
 from os.path import *
 import os
 import logging
@@ -23,7 +23,7 @@ def main():
     (f, g) = 2, 3
     [h, i] = 2, 3
 
-    map(itemgetter(0), [1, 2, 3])
+    list(map(itemgetter(0), [1, 2, 3]))
 
 if __name__ == '__main__':
     main()

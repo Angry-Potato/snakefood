@@ -14,7 +14,7 @@ write it.
 # See http://furius.ca/snakefood/ for licensing details.
 
 # stdlib imports
-import sys, __builtin__, re
+import sys, builtins, re
 from os.path import *
 import compiler
 
@@ -97,7 +97,7 @@ def main():
             defined.update(x[0] for x in assign_names)
             _, simple_names = get_names_from_ast(ast)
             for name, lineno in simple_names:
-                if name not in defined and name not in __builtin__.__dict__:
+                if name not in defined and name not in builtins.__dict__:
                     write("%s:%d:  Missing import for '%s'\n" % (fn, lineno, name))
 
         # Print out all the schmoo for debugging.

@@ -6,7 +6,7 @@ Cluster dependencies by regular expression.
 
 import sys
 import re
-from itertools import imap
+
 
 from snakefood.fallback.collections import defaultdict
 from snakefood.depends import read_depends, output_depends

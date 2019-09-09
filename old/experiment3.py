@@ -16,11 +16,11 @@ sys.path.insert(0, root)
 
 i = ImpImporter()
 mod = i.find_module('project')
-print mod, mod.get_filename()
+print(mod, mod.get_filename())
 
 i = ImpImporter(dirname(mod.get_filename()))
 mod = i.find_module('bar')
-print mod, mod.get_filename()
+print(mod, mod.get_filename())
 
 
 

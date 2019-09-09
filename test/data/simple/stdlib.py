@@ -7,7 +7,7 @@ import sys, imp, signal
 import os.path
 
 # Simple modules.
-import os, re, StringIO, urllib
+import os, re, io, urllib.request, urllib.parse, urllib.error
 
 # C modules.
 import operator, syslog

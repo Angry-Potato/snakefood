@@ -17,4 +17,4 @@ for d in depends:
     if (d[0][0].startswith ('/home/nbecker/idma-cdma') and \
         (d[1][0] == None or \
          d[1][0].startswith ('/home/nbecker/idma-cdma'))):
-        print d
+        print(d)

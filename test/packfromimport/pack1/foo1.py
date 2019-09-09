@@ -1,3 +1,3 @@
 from pack2 import *
 foo2.name()
-print foo2
+print(foo2)

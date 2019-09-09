@@ -72,7 +72,7 @@ class NamesVisitor(Visitor):
         self.attributes.append(node.name)
         self.attributes.reverse()
         attribs = self.attributes
-        for i in xrange(1, len(attribs)+1):
+        for i in range(1, len(attribs)+1):
             self.dotted.append(('.'.join(attribs[0:i]), node.lineno))
         self.simple.append((attribs[0], node.lineno))
         self.attributes = []

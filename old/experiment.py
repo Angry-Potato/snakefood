@@ -9,25 +9,25 @@ from os.path import *
 
 def find_mod(modname, fn):
 
-    print '\n\n\n-----', modname, fn
+    print('\n\n\n-----', modname, fn)
 
     mod = ImpImporter().find_module(modname)
-    print 'global', mod, mod and mod.get_filename()
+    print('global', mod, mod and mod.get_filename())
 
     mod = ImpImporter(dirname(fn)).find_module(modname)
-    print 'local', mod, mod and mod.get_filename()
+    print('local', mod, mod and mod.get_filename())
 
     try:
         mod = find_module(modname)
     except ImportError:
         mod = 'ERROR'
-    print 'imp global', mod
+    print('imp global', mod)
 
     try:
         mod = find_module(modname, dirname(fn))
     except ImportError:
         mod = 'ERROR'
-    print 'imp local', mod
+    print('imp local', mod)
 
 
 

@@ -2,7 +2,7 @@
 Support routines for all tests.
 """
 
-from __future__ import print_function
+
 
 import sys, os, re
 from os.path import *

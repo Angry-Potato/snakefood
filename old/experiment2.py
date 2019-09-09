@@ -11,22 +11,22 @@ for a in (imp.PY_SOURCE,
           imp.PKG_DIRECTORY,
           imp.C_BUILTIN,
           imp.PY_FROZEN):
-    print a
+    print(a)
 
 
 modname = 'signal'
 mod = ImpImporter().find_module(modname)
-print 'mod', mod
-print 'filename', mod.get_filename()
-print 'source', mod.get_source()
-print 'code', mod.get_code()
-print 'file', mod.file
-print 'etc', mod.etc
+print('mod', mod)
+print('filename', mod.get_filename())
+print('source', mod.get_source())
+print('code', mod.get_code())
+print('file', mod.file)
+print('etc', mod.etc)
 ## print 'ispackage', mod.is_package('util')
 ## print 'data', mod.get_data()
 
 for a in dir(mod):
     v = getattr(mod, a)
-    print a, v
+    print(a, v)
 
 

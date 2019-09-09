@@ -60,7 +60,7 @@ def list_imports():
                                                          opts.ignores):
                 print_('%s:%d: %s' % (fn, lineno, symname))
                 if opts.verbose:
-                    for no in xrange(lineno-1, len(lines)):
+                    for no in range(lineno-1, len(lines)):
                         l = lines[no].rstrip()
                         print_('   %s' % l)
                         if l[-1] != '\\':

@@ -264,19 +264,19 @@ def parse_python_source(fn):
     try:
         contents = open(fn, 'rU').read()
         lines = contents.splitlines()
-    except (IOError, OSError), e:
+    except (IOError, OSError) as e:
         logging.error("Could not read file '%s'." % fn)
         return None, None
 
     # Convert the file to an AST.
     try:
         ast = compiler.parse(contents)
-    except SyntaxError, e:
+    except SyntaxError as e:
         err = '%s:%s: %s' % (fn, e.lineno or '--', e.msg)
         logging.error("Error processing file '%s':\n%s" %
                       (fn, err))
         return None, lines
-    except TypeError, e:
+    except TypeError as e:
         # Note: this branch untested, applied from a user-submitted patch.
         err = '%s: %s' % (fn, str(e))
         logging.error("Error processing file '%s':\n%s" %

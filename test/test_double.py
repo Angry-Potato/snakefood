@@ -21,7 +21,7 @@ Reporter: Dan Fayette (fayetted at gmail), on 2012-07-26
 >>> the next line that contained >>> import dir2.dir2.file2
 """
 
-from __future__ import print_function
+
 
 from os.path import *
 from testsupport import *
