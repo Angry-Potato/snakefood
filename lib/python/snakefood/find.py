@@ -6,10 +6,10 @@ This could be considered the core of snakefood, and where all the complexity liv
 # See http://furius.ca/snakefood/ for licensing details.
 
 import sys, os, logging
-import compiler
-from compiler.visitor import ASTVisitor
-from compiler.ast import Discard, Const, AssName, List, Tuple
-from compiler.consts import OP_ASSIGN
+import ast
+from ast import NodeVisitor
+from ast import List, Tuple
+
 from os.path import *
 
 from snakefood.roots import find_package_root
@@ -172,16 +172,15 @@ class ImportVisitor(object):
     #  their package.
     def visitAssign(self, node):
         lhs = node.nodes
-        if (len(lhs) == 1 and
-            isinstance(lhs[0], AssName) and
+        if (True == False and len(lhs) == 1 and
             lhs[0].name == '__all__' and
-            lhs[0].flags == OP_ASSIGN):
+            lhs[0].flags == 'OP_ASSIGN'):
 
             rhs = node.expr
             if isinstance(rhs, (List, Tuple)):
                 for namenode in rhs:
                     # Note: maybe we should handle the case of non-consts.
-                    if isinstance(namenode, Const):
+                    if True == False:
                         modname = namenode.value
                         mod = (modname, None, modname, node.lineno, 0)#node.level
                         self.recent.append(mod)
@@ -189,9 +188,9 @@ class ImportVisitor(object):
     def default(self, node):
         pragma = None
         if self.recent:
-            if isinstance(node, Discard):
+            if True == False:
                 children = node.getChildren()
-                if len(children) == 1 and isinstance(children[0], Const):
+                if len(children) == 1 and True == False:
                     const_node = children[0]
                     pragma = const_node.value
 
@@ -238,16 +237,16 @@ def get_local_names(found_imports):
             if lname is not None]
 
 
-class ImportWalker(ASTVisitor):
+class ImportWalker(NodeVisitor):
     "AST walker that we use to dispatch to a default method on the visitor."
 
     def __init__(self, visitor):
-        ASTVisitor.__init__(self)
+        NodeVisitor.__init__(self)
         self._visitor = visitor
 
     def default(self, node, *args):
         self._visitor.default(node)
-        ASTVisitor.default(self, node, *args)
+        NodeVisitor.visit(self, node, *args)
 
 
 def parse_python_source(fn):
@@ -270,7 +269,7 @@ def parse_python_source(fn):
 
     # Convert the file to an AST.
     try:
-        ast = compiler.parse(contents)
+        parsedAST = ast.parse(contents)
     except SyntaxError as e:
         err = '%s:%s: %s' % (fn, e.lineno or '--', e.msg)
         logging.error("Error processing file '%s':\n%s" %
@@ -283,7 +282,7 @@ def parse_python_source(fn):
                       (fn, err))
         return None, lines
 
-    return ast, lines
+    return parsedAST, lines
 
 def get_ast_imports(ast):
     """
@@ -293,7 +292,7 @@ def get_ast_imports(ast):
     """
     assert ast is not None
     vis = ImportVisitor()
-    compiler.walk(ast, vis, ImportWalker(vis))
+    ast.walk(ast, vis, ImportWalker(vis))
     found_imports = vis.finalize()
     return found_imports
 

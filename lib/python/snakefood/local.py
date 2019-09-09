@@ -7,34 +7,34 @@ things.
 # See http://furius.ca/snakefood/ for licensing details.
 
 # stdlib imports
-import compiler
+import ast
 
 __all__ = ('get_names_from_ast', 'filter_unused_imports',
            'NamesVisitor', 'AssignVisitor', 'AllVisitor')
 
 
-def get_names_from_ast(ast):
+def get_names_from_ast(parsedAST):
     "Find all the names being referenced/used."
     vis = NamesVisitor()
-    compiler.walk(ast, vis)
+    # ast.walk(parsedAST, vis)
     dotted_names, simple_names = vis.finalize()
     return (dotted_names, simple_names)
 
 
-def filter_unused_imports(ast, found_imports):
+def filter_unused_imports(parsedAST, found_imports):
     """
-    Given the ast and the list of found imports in the file, find out which of
+    Given the parsedAST and the list of found imports in the file, find out which of
     the imports are not used and return two lists: a list of used imports, and a
     list of unused imports.
     """
     used_imports, unused_imports = [], []
 
     # Find all the names being referenced/used.
-    dotted_names, simple_names = get_names_from_ast(ast)
+    dotted_names, simple_names = get_names_from_ast(parsedAST)
 
     # Find all the names being exported via __all__.
     vis = AllVisitor()
-    compiler.walk(ast, vis)
+    # ast.walk(parsedAST, vis)
     exported = vis.finalize()
 
     # Check that all imports have been referenced at least once.

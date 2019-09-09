@@ -16,7 +16,7 @@ write it.
 # stdlib imports
 import sys, builtins, re
 from os.path import *
-import compiler
+import ast
 
 from six import print_
 
@@ -87,7 +87,7 @@ def main():
         # (Optionally) Compute the list of names that are being assigned to.
         if opts.do_missing or opts.debug:
             vis = AssignVisitor()
-            compiler.walk(ast, vis)
+            ast.walk(ast, vis)
             assign_names = vis.finalize()
 
         # (Optionally) Check for potentially missing imports (this cannot be
